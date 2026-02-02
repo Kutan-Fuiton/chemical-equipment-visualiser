@@ -8,7 +8,18 @@ from rest_framework import status
 from .services import analyze_csv
 from .models import Dataset
 
+from .serializers import DatasetSerializer
+
+from rest_framework.permissions import IsAuthenticated
+
+from django.http import FileResponse
+from .services import generate_pdf_report
+
+
+# Functionality of uploading CSV and getting analysis
 class UploadCSVView(APIView):
+    permission_classes = [IsAuthenticated]
+
     def post(self, request):
         file = request.FILES.get("file")
 
@@ -51,3 +62,35 @@ class UploadCSVView(APIView):
             status=status.HTTP_201_CREATED
         )
 
+# Functionality of retrieving last 5 uploads
+class DatasetHistoryView(APIView):
+    permission_classes = [IsAuthenticated]
+    
+    def get(self, request):
+        datasets = Dataset.objects.order_by("-uploaded_at")[:5]
+        serializer = DatasetSerializer(datasets, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+
+# Functionality of downloading PDF report
+class DatasetPDFReportView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, dataset_id):
+        try:
+            dataset = Dataset.objects.get(id=dataset_id)
+        except Dataset.DoesNotExist:
+            return Response(
+                {"error": "Dataset not found"},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        pdf_path = generate_pdf_report(dataset)
+
+        return FileResponse(
+            open(pdf_path, "rb"),
+            content_type="application/pdf",
+            as_attachment=True,
+            filename=f"dataset_report_{dataset_id}.pdf",
+        )
