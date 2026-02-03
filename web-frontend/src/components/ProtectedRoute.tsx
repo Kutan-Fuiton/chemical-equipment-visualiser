@@ -1,18 +1,13 @@
 import { Navigate } from "react-router-dom";
-import type { JSX } from "react/jsx-dev-runtime";
+import type { ReactElement } from "react";
 
 interface Props {
-  children: JSX.Element;
+  children: ReactElement;
 }
 
 const ProtectedRoute = ({ children }: Props) => {
   const token = localStorage.getItem("token");
-
-  if (!token) {
-    return <Navigate to="/login" replace />;
-  }
-
-  return children;
+  return token ? children : <Navigate to="/login" replace />;
 };
 
 export default ProtectedRoute;

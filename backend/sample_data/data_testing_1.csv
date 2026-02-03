@@ -1,0 +1,16 @@
+Equipment Name,Type,Flowrate,Pressure,Temperature
+FeedPump-A,Pump,115,4.8,105
+TurboCompressor-A,Compressor,88,7.9,92
+ControlValve-A,Valve,55,3.8,98
+Cooler-A,HeatExchanger,142,5.8,122
+BoostPump-B,Pump,128,5.2,112
+IsolationValve-B,Valve,52,3.7,96
+CatalyticReactor-A,Reactor,135,7.1,135
+TransferPump-C,Pump,118,4.9,108
+RefluxCondenser-A,Condenser,148,6.3,118
+AirCompressor-B,Compressor,92,7.5,94
+Heater-B,HeatExchanger,147,5.9,126
+RegulatorValve-C,Valve,57,3.9,100
+MainPump-D,Pump,126,5.4,114
+BatchReactor-B,Reactor,138,6.8,132
+Chiller-B,Condenser,152,6.5,120

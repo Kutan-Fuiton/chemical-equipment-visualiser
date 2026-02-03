@@ -1,16 +1,24 @@
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import Login from "./auth/login";
-import Upload from "./pages/upload";
-import History from "./pages/history";
-import Navbar from "./components/Navbar";
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
+import Login          from "./auth/login";
+import Upload         from "./pages/upload";
+import History        from "./pages/history";
+import Navbar         from "./components/Navbar";
 import ProtectedRoute from "./components/ProtectedRoute";
+import "./index.css";
 
-function App() {
+/* inner wrapper so useLocation works (must be inside BrowserRouter) */
+function Layout() {
+  const location = useLocation();
+  const showNav = location.pathname !== "/login";
+
   return (
-    <BrowserRouter>
-      <Navbar />
+    <div style={{ minHeight: "100vh", background: "#0a0e1a", fontFamily: "'Rajdhani', sans-serif" }}>
+      {showNav && <Navbar />}
 
       <Routes>
+        {/* 🔑 ROOT → LOGIN */}
+        <Route path="/" element={<Navigate to="/login" replace />} />
+
         <Route path="/login" element={<Login />} />
 
         <Route
@@ -31,12 +39,18 @@ function App() {
           }
         />
 
-        {/* Default route */}
-        <Route
-          path="*"
-          element={<Navigate to="/upload" replace />}
-        />
+        {/* 🔑 EVERYTHING ELSE → LOGIN */}
+        <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
+    </div>
+  );
+}
+
+
+function App() {
+  return (
+    <BrowserRouter>
+      <Layout />
     </BrowserRouter>
   );
 }
