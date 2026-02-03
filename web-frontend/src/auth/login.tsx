@@ -21,7 +21,7 @@ const Login = () => {
       const token = response.data.auth_token;
       localStorage.setItem("token", token);
 
-      alert("Login successful ✅");
+      window.location.href = "/upload";
     } catch (err: any) {
       setError("Invalid username or password");
     } finally {
