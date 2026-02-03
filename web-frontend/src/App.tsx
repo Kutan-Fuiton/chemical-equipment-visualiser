@@ -1,12 +1,11 @@
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
-import Login          from "./auth/login";
-import Upload         from "./pages/upload";
-import History        from "./pages/history";
-import Navbar         from "./components/Navbar";
+import Login from "./auth/login";
+import Upload from "./pages/upload";
+import History from "./pages/history";
+import Navbar from "./components/Navbar";
 import ProtectedRoute from "./components/ProtectedRoute";
 import "./index.css";
 
-/* inner wrapper so useLocation works (must be inside BrowserRouter) */
 function Layout() {
   const location = useLocation();
   const showNav = location.pathname !== "/login";
@@ -16,7 +15,6 @@ function Layout() {
       {showNav && <Navbar />}
 
       <Routes>
-        {/* 🔑 ROOT → LOGIN */}
         <Route path="/" element={<Navigate to="/login" replace />} />
 
         <Route path="/login" element={<Login />} />
@@ -39,7 +37,6 @@ function Layout() {
           }
         />
 
-        {/* 🔑 EVERYTHING ELSE → LOGIN */}
         <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
     </div>
