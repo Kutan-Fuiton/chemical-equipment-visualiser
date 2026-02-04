@@ -1,0 +1,483 @@
+/* 
+ * Chemical Equipment Visualizer - Desktop App Stylesheet
+ * Matching web frontend theme: Dark navy with cyan accents
+ * Fonts: Orbitron (display), Rajdhani (body)
+ */
+
+/* ============================================ */
+/* Color Palette (from web frontend)           */
+/* ============================================ */
+/*
+  Base Background: #0a0e1a
+  Surface:         #111827
+  Card:            #151d2f
+  Input:           #0f1623
+  Text:            #f0f4f8
+  Text Muted:      #94a3b8
+  Cyan:            #63caff
+  Emerald:         #34d399
+  Amber:           #fbbf24
+  Rose:            #fb7185
+  Violet:          #a78bfa
+*/
+
+/* ============================================ */
+/* Global Styles                                */
+/* ============================================ */
+
+QWidget {
+    background-color: #0a0e1a;
+    color: #f0f4f8;
+    font-family: "Rajdhani", "Segoe UI", Arial, sans-serif;
+    font-size: 15px;
+    font-weight: 500;
+}
+
+QLabel {
+    background-color: transparent;
+}
+
+QScrollArea {
+    border: none;
+    background-color: transparent;
+}
+
+QScrollBar:vertical {
+    background-color: transparent;
+    width: 6px;
+    border-radius: 3px;
+}
+
+QScrollBar::handle:vertical {
+    background-color: #2d3a50;
+    border-radius: 3px;
+    min-height: 30px;
+}
+
+QScrollBar::handle:vertical:hover {
+    background-color: #63caff;
+}
+
+QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
+    height: 0;
+}
+
+/* ============================================ */
+/* Sidebar                                      */
+/* ============================================ */
+
+#sidebar {
+    background-color: #111827;
+    border-right: 1px solid #1e293b;
+}
+
+#sidebarTitle {
+    color: #63caff;
+    font-family: "Orbitron", "Segoe UI", sans-serif;
+    font-size: 22px;
+    font-weight: 700;
+    padding: 10px 0;
+    letter-spacing: 2px;
+}
+
+#sidebarSubtitle {
+    color: #64748b;
+    font-size: 13px;
+    font-weight: 500;
+}
+
+#navButton {
+    background-color: transparent;
+    border: none;
+    border-radius: 10px;
+    padding: 14px 18px;
+    text-align: left;
+    color: #94a3b8;
+    font-size: 15px;
+    font-weight: 600;
+}
+
+#navButton:hover {
+    background-color: rgba(99, 202, 255, 0.08);
+    color: #f0f4f8;
+}
+
+#navButton:checked {
+    background-color: #63caff;
+    color: #0a0e1a;
+    font-weight: 700;
+}
+
+#logoutButton {
+    background-color: transparent;
+    border: 1px solid #334155;
+    border-radius: 10px;
+    padding: 12px 18px;
+    color: #94a3b8;
+    font-weight: 600;
+}
+
+#logoutButton:hover {
+    background-color: #fb7185;
+    border-color: #fb7185;
+    color: #0a0e1a;
+}
+
+/* ============================================ */
+/* Content Area                                 */
+/* ============================================ */
+
+#content {
+    background-color: #0a0e1a;
+}
+
+#pageTitle {
+    color: #f0f4f8;
+    font-family: "Orbitron", "Segoe UI", sans-serif;
+    font-size: 26px;
+    font-weight: 700;
+    letter-spacing: 1px;
+}
+
+#pageDescription {
+    color: #64748b;
+    font-size: 15px;
+    font-weight: 500;
+}
+
+/* ============================================ */
+/* Login Page                                   */
+/* ============================================ */
+
+#loginCard {
+    background-color: #151d2f;
+    border-radius: 20px;
+    border: 1px solid #1e293b;
+}
+
+#loginTitle {
+    color: #63caff;
+    font-family: "Orbitron", "Segoe UI", sans-serif;
+    font-size: 24px;
+    font-weight: 700;
+    letter-spacing: 2px;
+}
+
+#loginSubtitle {
+    color: #64748b;
+    font-size: 15px;
+    font-weight: 500;
+}
+
+#fieldLabel {
+    color: #94a3b8;
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 6px;
+}
+
+#inputField {
+    background-color: #0f1623;
+    border: 1px solid #334155;
+    border-radius: 10px;
+    padding: 14px 18px;
+    color: #f0f4f8;
+    font-size: 15px;
+    font-weight: 500;
+}
+
+#inputField:focus {
+    border-color: #63caff;
+    background-color: #0a0e1a;
+}
+
+#inputField::placeholder {
+    color: #475569;
+}
+
+#primaryButton {
+    background-color: #63caff;
+    border: none;
+    border-radius: 10px;
+    padding: 16px 24px;
+    color: #0a0e1a;
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+}
+
+#primaryButton:hover {
+    background-color: #7dd3fc;
+}
+
+#primaryButton:disabled {
+    background-color: #334155;
+    color: #64748b;
+}
+
+#secondaryButton {
+    background-color: #151d2f;
+    border: 1px solid #334155;
+    border-radius: 10px;
+    padding: 12px 20px;
+    color: #f0f4f8;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+#secondaryButton:hover {
+    background-color: #1e293b;
+    border-color: #63caff;
+}
+
+#outlineButton {
+    background-color: transparent;
+    border: 1px solid #63caff;
+    border-radius: 10px;
+    padding: 10px 18px;
+    color: #63caff;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+#outlineButton:hover {
+    background-color: #63caff;
+    color: #0a0e1a;
+}
+
+#errorLabel {
+    color: #fb7185;
+    font-size: 14px;
+    font-weight: 600;
+    padding: 12px;
+    background-color: rgba(251, 113, 133, 0.1);
+    border-radius: 10px;
+    border: 1px solid rgba(251, 113, 133, 0.2);
+}
+
+#successLabel {
+    color: #34d399;
+    font-size: 14px;
+    font-weight: 600;
+    padding: 12px;
+    background-color: rgba(52, 211, 153, 0.1);
+    border-radius: 10px;
+    border: 1px solid rgba(52, 211, 153, 0.2);
+}
+
+#hintLabel {
+    color: #64748b;
+    font-size: 13px;
+    font-weight: 500;
+}
+
+/* ============================================ */
+/* Upload Page                                  */
+/* ============================================ */
+
+#dropZone {
+    background-color: #151d2f;
+    border: 2px dashed #334155;
+    border-radius: 20px;
+    padding: 50px;
+}
+
+#dropZone:hover {
+    border-color: #63caff;
+    background-color: rgba(99, 202, 255, 0.05);
+}
+
+#dropZone[dragOver="true"] {
+    border-color: #63caff;
+    background-color: rgba(99, 202, 255, 0.1);
+}
+
+#dropZoneText {
+    color: #f0f4f8;
+    font-size: 18px;
+    font-weight: 600;
+}
+
+#dropZoneSubtext {
+    color: #64748b;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+#fileLabel {
+    color: #64748b;
+    font-size: 15px;
+    font-weight: 500;
+}
+
+#fileLabelSelected {
+    color: #34d399;
+    font-size: 15px;
+    font-weight: 600;
+}
+
+#infoCard {
+    background-color: #151d2f;
+    border-radius: 14px;
+    padding: 20px;
+    border-left: 4px solid #63caff;
+}
+
+#infoTitle {
+    color: #63caff;
+    font-size: 14px;
+    font-weight: 700;
+    margin-bottom: 10px;
+}
+
+#infoText {
+    color: #94a3b8;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+/* ============================================ */
+/* Charts Page                                  */
+/* ============================================ */
+
+#statCard {
+    background-color: #151d2f;
+    border-radius: 14px;
+    padding: 24px;
+    border: 1px solid #1e293b;
+}
+
+#statCard:hover {
+    border-color: rgba(99, 202, 255, 0.3);
+}
+
+#statTitle {
+    color: #94a3b8;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+#statValue {
+    color: #63caff;
+    font-family: "Orbitron", "Segoe UI", sans-serif;
+    font-size: 28px;
+    font-weight: 700;
+}
+
+#chartCard {
+    background-color: #151d2f;
+    border-radius: 14px;
+    padding: 24px;
+    border: 1px solid #1e293b;
+}
+
+#chartTitle {
+    color: #f0f4f8;
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 12px;
+}
+
+/* ============================================ */
+/* History Page                                 */
+/* ============================================ */
+
+#datasetCard {
+    background-color: #151d2f;
+    border-radius: 14px;
+    border: 1px solid #1e293b;
+}
+
+#datasetCard:hover {
+    border-color: #63caff;
+    background-color: rgba(99, 202, 255, 0.03);
+}
+
+#datasetFilename {
+    color: #f0f4f8;
+    font-size: 16px;
+    font-weight: 700;
+}
+
+#datasetDate {
+    color: #64748b;
+    font-size: 13px;
+    font-weight: 500;
+}
+
+#datasetStats {
+    color: #94a3b8;
+    font-size: 13px;
+    font-weight: 500;
+}
+
+/* ============================================ */
+/* Message Box                                  */
+/* ============================================ */
+
+QMessageBox {
+    background-color: #151d2f;
+}
+
+QMessageBox QLabel {
+    color: #f0f4f8;
+    font-size: 15px;
+}
+
+QMessageBox QPushButton {
+    background-color: #63caff;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 24px;
+    color: #0a0e1a;
+    font-weight: 700;
+    min-width: 90px;
+}
+
+QMessageBox QPushButton:hover {
+    background-color: #7dd3fc;
+}
+
+/* ============================================ */
+/* File Dialog                                  */
+/* ============================================ */
+
+QFileDialog {
+    background-color: #0a0e1a;
+}
+
+QFileDialog QLabel {
+    color: #f0f4f8;
+}
+
+QFileDialog QPushButton {
+    background-color: #151d2f;
+    border: 1px solid #334155;
+    border-radius: 6px;
+    padding: 8px 16px;
+    color: #f0f4f8;
+}
+
+QFileDialog QPushButton:hover {
+    background-color: #1e293b;
+}
+
+QFileDialog QLineEdit {
+    background-color: #0f1623;
+    border: 1px solid #334155;
+    border-radius: 6px;
+    padding: 8px;
+    color: #f0f4f8;
+}
+
+QFileDialog QTreeView, QFileDialog QListView {
+    background-color: #0f1623;
+    border: 1px solid #334155;
+    border-radius: 6px;
+    color: #f0f4f8;
+}
+
+QFileDialog QTreeView::item:selected, QFileDialog QListView::item:selected {
+    background-color: #63caff;
+    color: #0a0e1a;
+}
