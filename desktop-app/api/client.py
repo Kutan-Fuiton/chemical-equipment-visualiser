@@ -95,7 +95,7 @@ class APIClient:
                 headers = {"Authorization": f"Token {self.token}"}
 
                 response = requests.post(
-                    f"{self.base_url}/api/equipment/upload/",
+                    f"{self.base_url}/api/upload/",
                     files=files,
                     headers=headers,
                 )
@@ -118,7 +118,7 @@ class APIClient:
         """
         try:
             response = requests.get(
-                f"{self.base_url}/api/equipment/history/",
+                f"{self.base_url}/api/history/",
                 headers=self._get_headers(),
             )
 
@@ -139,7 +139,7 @@ class APIClient:
         """
         try:
             response = requests.get(
-                f"{self.base_url}/api/equipment/report/{dataset_id}/",
+                f"{self.base_url}/api/report/{dataset_id}/",
                 headers=self._get_headers(),
                 stream=True,
             )

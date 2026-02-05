@@ -14,14 +14,16 @@ from api import api_client
 
 
 class DropZone(QFrame):
-    """Drag and drop zone for CSV files."""
+    """Drag and drop zone for CSV files - also clickable."""
     
     file_dropped = pyqtSignal(str)
+    clicked = pyqtSignal()  # Signal for click to browse
 
     def __init__(self):
         super().__init__()
         self.setAcceptDrops(True)
         self.setObjectName("dropZone")
+        self.setCursor(Qt.CursorShape.PointingHandCursor)
         self.setup_ui()
 
     def setup_ui(self):
@@ -38,10 +40,15 @@ class DropZone(QFrame):
         text.setAlignment(Qt.AlignmentFlag.AlignCenter)
         layout.addWidget(text)
 
-        subtext = QLabel("or click Browse to select")
+        subtext = QLabel("or click anywhere to browse")
         subtext.setObjectName("dropZoneSubtext")
         subtext.setAlignment(Qt.AlignmentFlag.AlignCenter)
         layout.addWidget(subtext)
+
+    def mousePressEvent(self, event):
+        """Handle click to open file browser."""
+        self.clicked.emit()
+        super().mousePressEvent(event)
 
     def dragEnterEvent(self, event: QDragEnterEvent):
         if event.mimeData().hasUrls():
@@ -93,26 +100,18 @@ class UploadPage(QWidget):
 
         layout.addSpacing(10)
 
-        # Drop zone
+        # Drop zone (also clickable to browse)
         self.drop_zone = DropZone()
         self.drop_zone.setMinimumHeight(200)
         self.drop_zone.file_dropped.connect(self.on_file_selected)
+        self.drop_zone.clicked.connect(self.browse_file)
         layout.addWidget(self.drop_zone)
 
-        # File selection row
-        file_row = QHBoxLayout()
-        
+        # Selected file label
         self.file_label = QLabel("No file selected")
         self.file_label.setObjectName("fileLabel")
-        file_row.addWidget(self.file_label, 1)
-
-        browse_btn = QPushButton("Browse")
-        browse_btn.setObjectName("secondaryButton")
-        browse_btn.setCursor(Qt.CursorShape.PointingHandCursor)
-        browse_btn.clicked.connect(self.browse_file)
-        file_row.addWidget(browse_btn)
-
-        layout.addLayout(file_row)
+        self.file_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        layout.addWidget(self.file_label)
 
         # Upload button
         self.upload_btn = QPushButton("Upload & Analyze")
@@ -182,24 +181,26 @@ class UploadPage(QWidget):
             return
 
         self.upload_btn.setEnabled(False)
-        self.upload_btn.setText("Uploading...")
+        self.upload_btn.setText("⏳ Uploading & Analyzing...")
         self.status_label.hide()
 
         success, result = api_client.upload_csv(self.selected_file)
 
         if success:
-            self.status_label.setText("✓ Upload successful!")
+            self.status_label.setText("✓ Upload successful! Generating charts...")
             self.status_label.setObjectName("successLabel")
             self.status_label.show()
+            self.style().polish(self.status_label)
+            # Emit the signal with the result data
             self.upload_complete.emit(result)
         else:
             self.status_label.setText(f"✗ {result}")
             self.status_label.setObjectName("errorLabel")
             self.status_label.show()
+            self.upload_btn.setEnabled(True)
+            self.upload_btn.setText("Upload & Analyze")
 
         self.style().polish(self.status_label)
-        self.upload_btn.setEnabled(True)
-        self.upload_btn.setText("Upload & Analyze")
 
     def use_demo_csv(self):
         """Use the demo CSV file from backend sample_data."""
@@ -225,4 +226,5 @@ class UploadPage(QWidget):
         self.file_label.setObjectName("fileLabel")
         self.style().polish(self.file_label)
         self.upload_btn.setEnabled(False)
+        self.upload_btn.setText("Upload & Analyze")
         self.status_label.hide()

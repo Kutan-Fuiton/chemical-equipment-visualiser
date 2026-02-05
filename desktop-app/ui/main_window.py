@@ -111,6 +111,7 @@ class MainWindow(QMainWindow):
         self.stack.addWidget(self.upload_page)
 
         self.charts_page = ChartsPage()
+        self.charts_page.back_to_upload.connect(lambda: self.switch_page(0))
         self.stack.addWidget(self.charts_page)
 
         self.history_page = HistoryPage()
@@ -148,8 +149,15 @@ class MainWindow(QMainWindow):
 
     def on_upload_complete(self, data: dict):
         """Handle successful upload - show charts."""
-        self.charts_page.display_results(data)
-        self.switch_page(1)  # Switch to charts
+        try:
+            self.charts_page.display_results(data)
+            # Reset upload form for next upload
+            self.upload_page.reset()
+            self.switch_page(1)  # Switch to charts
+        except Exception as e:
+            print(f"Error displaying charts: {e}")
+            # Still try to switch to charts page for debugging
+            self.switch_page(1)
 
     def on_view_from_history(self, dataset: dict):
         """View charts from history dataset."""

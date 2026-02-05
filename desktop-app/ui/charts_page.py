@@ -4,14 +4,15 @@ Charts Page - Data visualization with matplotlib
 
 from PyQt6.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QLabel,
-    QFrame, QGridLayout, QScrollArea
+    QFrame, QGridLayout, QScrollArea, QPushButton
 )
-from PyQt6.QtCore import Qt
+from PyQt6.QtCore import Qt, pyqtSignal
 from PyQt6.QtGui import QFont
 
 from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
 import matplotlib.pyplot as plt
+import numpy as np
 
 
 class StatCard(QFrame):
@@ -51,8 +52,10 @@ class ChartWidget(QFrame):
     def __init__(self, title: str):
         super().__init__()
         self.setObjectName("chartCard")
+        self.setMinimumHeight(350)  # Ensure minimum height for charts
         
         layout = QVBoxLayout(self)
+        layout.setContentsMargins(20, 15, 20, 20)
         
         # Title
         title_label = QLabel(title)
@@ -60,10 +63,11 @@ class ChartWidget(QFrame):
         title_label.setFont(QFont("Segoe UI", 14, QFont.Weight.Bold))
         layout.addWidget(title_label)
 
-        # Chart canvas with web frontend colors
-        self.figure = Figure(figsize=(5, 4), facecolor='#151d2f')
+        # Chart canvas with web frontend colors - larger figure size
+        self.figure = Figure(figsize=(10, 5), facecolor='#151d2f')
         self.canvas = FigureCanvas(self.figure)
         self.canvas.setStyleSheet("background-color: #151d2f;")
+        self.canvas.setMinimumHeight(280)
         layout.addWidget(self.canvas)
 
     def plot_bar(self, data: dict, xlabel: str = "", ylabel: str = ""):
@@ -73,7 +77,7 @@ class ChartWidget(QFrame):
         
         # Style matching web frontend
         ax.set_facecolor('#0a0e1a')
-        ax.tick_params(colors='#f0f4f8', labelsize=10)
+        ax.tick_params(colors='#f0f4f8', labelsize=11)
         ax.spines['bottom'].set_color('#334155')
         ax.spines['top'].set_visible(False)
         ax.spines['right'].set_visible(False)
@@ -81,21 +85,30 @@ class ChartWidget(QFrame):
 
         # Plot with web frontend colors
         colors = ['#63caff', '#34d399', '#fbbf24', '#fb7185', '#a78bfa', '#38bdf8']
-        bars = ax.bar(list(data.keys()), list(data.values()), 
-                      color=colors[:len(data)])
+        x_labels = list(data.keys())
+        values = list(data.values())
+        
+        x_positions = range(len(x_labels))
+        bars = ax.bar(x_positions, values, color=colors[:len(data)], width=0.6)
+        
+        # Set x-tick labels with full names
+        ax.set_xticks(x_positions)
+        ax.set_xticklabels(x_labels, rotation=30, ha='right', fontsize=10)
         
         ax.set_xlabel(xlabel, color='#94a3b8', fontsize=11)
         ax.set_ylabel(ylabel, color='#94a3b8', fontsize=11)
         
-        # Rotate labels if many items
-        if len(data) > 4:
-            plt.setp(ax.xaxis.get_majorticklabels(), rotation=45, ha='right')
+        # Add value labels on top of bars
+        for bar, val in zip(bars, values):
+            ax.text(bar.get_x() + bar.get_width()/2, bar.get_height() + 0.1,
+                   str(int(val)), ha='center', va='bottom', 
+                   color='#f0f4f8', fontsize=10)
         
-        self.figure.tight_layout()
+        self.figure.tight_layout(pad=2.0)
         self.canvas.draw()
 
     def plot_pie(self, data: dict):
-        """Plot a pie chart."""
+        """Plot a pie chart with legend instead of inline labels."""
         self.figure.clear()
         ax = self.figure.add_subplot(111)
         ax.set_facecolor('#151d2f')
@@ -103,24 +116,117 @@ class ChartWidget(QFrame):
         # Web frontend colors
         colors = ['#63caff', '#34d399', '#fbbf24', '#fb7185', '#a78bfa', '#38bdf8']
         
-        wedges, texts, autotexts = ax.pie(
-            list(data.values()), 
-            labels=list(data.keys()),
-            autopct='%1.1f%%',
-            colors=colors[:len(data)],
-            textprops={'color': '#f0f4f8', 'fontsize': 11}
-        )
+        labels = list(data.keys())
+        values = list(data.values())
+        total = sum(values)
         
-        for autotext in autotexts:
-            autotext.set_color('#0a0e1a')
-            autotext.set_fontweight('bold')
+        # Create pie without labels (we'll use legend)
+        wedges = ax.pie(
+            values, 
+            colors=colors[:len(data)],
+            startangle=90,
+        )[0]  # Only get wedges from the tuple
+        
+        # Add percentages inside wedges
+        for i, (wedge, val) in enumerate(zip(wedges, values)):
+            pct = val / total * 100
+            angle = (wedge.theta2 + wedge.theta1) / 2
+            x = 0.6 * wedge.r * np.cos(np.radians(angle))
+            y = 0.6 * wedge.r * np.sin(np.radians(angle))
+            ax.text(x, y, f'{pct:.1f}%', ha='center', va='center',
+                   color='white', fontsize=10, fontweight='bold')
+        
+        # Add legend outside the pie
+        legend_labels = [f'{label} ({val})' for label, val in zip(labels, values)]
+        ax.legend(wedges, legend_labels, 
+                  loc='center left', 
+                  bbox_to_anchor=(1.0, 0.5),
+                  fontsize=10,
+                  frameon=False,
+                  labelcolor='#f0f4f8')
+        
+        ax.axis('equal')
+        self.figure.tight_layout(pad=1.5)
+        self.canvas.draw()
 
-        self.figure.tight_layout()
+    def plot_grouped_bar(self, type_metrics: dict):
+        """Plot a grouped bar chart comparing metrics across equipment types."""
+        self.figure.clear()
+        ax = self.figure.add_subplot(111)
+        
+        # Style
+        ax.set_facecolor('#0a0e1a')
+        ax.tick_params(colors='#f0f4f8', labelsize=10)
+        ax.spines['bottom'].set_color('#334155')
+        ax.spines['top'].set_visible(False)
+        ax.spines['right'].set_visible(False)
+        ax.spines['left'].set_color('#334155')
+
+        types = list(type_metrics.keys())
+        x = np.arange(len(types))
+        width = 0.25
+        
+        # Extract metrics
+        flowrates = [type_metrics[t].get('avg_flowrate', 0) for t in types]
+        pressures = [type_metrics[t].get('avg_pressure', 0) for t in types]
+        temps = [type_metrics[t].get('avg_temperature', 0) for t in types]
+        
+        # Create bars
+        bars1 = ax.bar(x - width, flowrates, width, label='Flowrate', color='#63caff')
+        bars2 = ax.bar(x, pressures, width, label='Pressure', color='#34d399')
+        bars3 = ax.bar(x + width, temps, width, label='Temperature', color='#fb7185')
+        
+        ax.set_xticks(x)
+        ax.set_xticklabels(types, rotation=30, ha='right', fontsize=9)
+        ax.set_ylabel('Value', color='#94a3b8', fontsize=11)
+        ax.legend(loc='upper right', frameon=False, labelcolor='#f0f4f8', fontsize=9)
+        
+        self.figure.tight_layout(pad=2.0)
+        self.canvas.draw()
+
+    def plot_horizontal_bar(self, data: dict):
+        """Plot a horizontal bar chart (ranking)."""
+        self.figure.clear()
+        ax = self.figure.add_subplot(111)
+        
+        # Style
+        ax.set_facecolor('#0a0e1a')
+        ax.tick_params(colors='#f0f4f8', labelsize=11)
+        ax.spines['bottom'].set_color('#334155')
+        ax.spines['top'].set_visible(False)
+        ax.spines['right'].set_visible(False)
+        ax.spines['left'].set_color('#334155')
+
+        # Sort by value descending
+        sorted_data = sorted(data.items(), key=lambda x: x[1], reverse=True)
+        labels = [item[0] for item in sorted_data]
+        values = [item[1] for item in sorted_data]
+        
+        colors = ['#63caff', '#34d399', '#fbbf24', '#fb7185', '#a78bfa', '#38bdf8']
+        bar_colors = [colors[i % len(colors)] for i in range(len(labels))]
+        
+        y_pos = range(len(labels))
+        bars = ax.barh(y_pos, values, color=bar_colors, height=0.6)
+        
+        ax.set_yticks(y_pos)
+        ax.set_yticklabels(labels)
+        ax.set_xlabel('Count', color='#94a3b8', fontsize=11)
+        ax.invert_yaxis()  # Highest at top
+        
+        # Add value labels
+        for bar, val in zip(bars, values):
+            ax.text(bar.get_width() + 0.2, bar.get_y() + bar.get_height()/2,
+                   str(int(val)), ha='left', va='center', 
+                   color='#f0f4f8', fontsize=10)
+        
+        self.figure.tight_layout(pad=2.0)
         self.canvas.draw()
 
 
 class ChartsPage(QWidget):
     """Page displaying analysis charts and statistics."""
+
+    back_to_upload = pyqtSignal()
 
     def __init__(self):
         super().__init__()
@@ -137,11 +243,24 @@ class ChartsPage(QWidget):
         self.layout.setContentsMargins(40, 40, 40, 40)
         self.layout.setSpacing(20)
 
-        # Header
+        # Header with back button
+        header_layout = QHBoxLayout()
+        
         header = QLabel("Analysis Results")
         header.setObjectName("pageTitle")
         header.setFont(QFont("Segoe UI", 24, QFont.Weight.Bold))
-        self.layout.addWidget(header)
+        header_layout.addWidget(header)
+        
+        header_layout.addStretch()
+        
+        # Upload another button
+        upload_again_btn = QPushButton("📤 Upload Another")
+        upload_again_btn.setObjectName("secondaryButton")
+        upload_again_btn.setCursor(Qt.CursorShape.PointingHandCursor)
+        upload_again_btn.clicked.connect(self.back_to_upload.emit)
+        header_layout.addWidget(upload_again_btn)
+        
+        self.layout.addLayout(header_layout)
 
         self.description = QLabel("Upload a dataset to see analysis results.")
         self.description.setObjectName("pageDescription")
@@ -183,12 +302,14 @@ class ChartsPage(QWidget):
         """Display analysis results from API response."""
         self.clear_charts()
         
+        # Handle both direct summary and nested summary
         summary = data.get("summary", data)
         
-        # Update description
-        self.description.setText(f"Analysis complete for dataset #{data.get('dataset_id', 'N/A')}")
+        # Update description with dataset info
+        dataset_id = data.get("dataset_id", "N/A")
+        self.description.setText(f"Analysis complete for dataset #{dataset_id}")
 
-        # Stats cards
+        # Stats cards - use safe .get() with defaults
         stats = [
             ("Total Equipment", str(summary.get("total_equipment", 0)), "🔧"),
             ("Avg Flowrate", f"{summary.get('avg_flowrate', 0):.2f}", "💨"),
@@ -202,6 +323,8 @@ class ChartsPage(QWidget):
 
         # Type distribution bar chart
         type_dist = summary.get("type_distribution", {})
+        type_metrics = summary.get("type_metrics", {})
+        
         if type_dist:
             bar_chart = ChartWidget("Equipment Type Distribution")
             bar_chart.plot_bar(type_dist, xlabel="Type", ylabel="Count")
@@ -211,6 +334,22 @@ class ChartsPage(QWidget):
             pie_chart = ChartWidget("Type Distribution (Percentage)")
             pie_chart.plot_pie(type_dist)
             self.charts_layout.addWidget(pie_chart)
+            
+            # Grouped bar chart - metrics by type
+            if type_metrics:
+                grouped_chart = ChartWidget("Metrics by Equipment Type")
+                grouped_chart.plot_grouped_bar(type_metrics)
+                self.charts_layout.addWidget(grouped_chart)
+            
+            # Horizontal bar chart - ranking
+            ranking_chart = ChartWidget("Equipment Ranking")
+            ranking_chart.plot_horizontal_bar(type_dist)
+            self.charts_layout.addWidget(ranking_chart)
+        else:
+            # If no type distribution, show a message
+            no_data_label = QLabel("No equipment type data available")
+            no_data_label.setObjectName("pageDescription")
+            self.charts_layout.addWidget(no_data_label)
 
     def display_from_history(self, dataset: dict):
         """Display results from a history dataset."""
@@ -240,3 +379,8 @@ class ChartsPage(QWidget):
             pie_chart = ChartWidget("Type Distribution (Percentage)")
             pie_chart.plot_pie(type_dist)
             self.charts_layout.addWidget(pie_chart)
+            
+            # Horizontal bar chart - ranking
+            ranking_chart = ChartWidget("Equipment Ranking")
+            ranking_chart.plot_horizontal_bar(type_dist)
+            self.charts_layout.addWidget(ranking_chart)
