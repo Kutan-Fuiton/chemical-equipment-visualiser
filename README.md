@@ -12,6 +12,8 @@ A high-performance, hybrid analytics system designed for chemical engineers to v
 
 ## 🏗️ System Architecture
 
+The system follows a client-server architecture with two frontend clients communicating with a centralized backend API.
+
 ```
                     ╔══════════════════════════════════════════════════════════╗
                     ║          CHEMICAL EQUIPMENT VISUALIZER                   ║
@@ -68,6 +70,8 @@ A high-performance, hybrid analytics system designed for chemical engineers to v
 
 ## 🚀 Features
 
+Both web and desktop applications provide the same core functionality with platform-specific implementations.
+
 | Component | Key Features |
 |-----------|-------------|
 | **🔧 Backend** | Token auth (Djoser) • CSV parsing (Pandas) • PDF generation (ReportLab) • User-isolated data |
@@ -77,6 +81,8 @@ A high-performance, hybrid analytics system designed for chemical engineers to v
 ---
 
 ## 🧱 Tech Stack
+
+Built with modern, production-ready technologies across all layers.
 
 | Layer | Technologies |
 |-------|-------------|
@@ -88,6 +94,8 @@ A high-performance, hybrid analytics system designed for chemical engineers to v
 
 ## 🔐 Demo Credentials
 
+Use these test accounts to explore the application. Each user has isolated data.
+
 | Username | Password |
 |----------|----------|
 | `test1` | `admin.test1` |
@@ -97,6 +105,8 @@ A high-performance, hybrid analytics system designed for chemical engineers to v
 ---
 
 ## ▶️ Quick Start
+
+Get the project running locally in minutes.
 
 ### 🔧 Backend
 ```bash
