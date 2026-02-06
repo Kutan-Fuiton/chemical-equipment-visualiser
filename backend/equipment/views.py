@@ -37,8 +37,9 @@ class UploadCSVView(APIView):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        # Save to database
+        # Save to database with current user
         dataset = Dataset.objects.create(
+            user=request.user,
             filename=file.name,
             total_equipment=summary["total_equipment"],
             avg_flowrate=summary["avg_flowrate"],
@@ -47,27 +48,29 @@ class UploadCSVView(APIView):
             type_distribution=summary["type_distribution"],
         )
 
-        # Keep only last 5 uploads
-        datasets = Dataset.objects.order_by("-uploaded_at")
-        if datasets.count() > 5:
-            for old in datasets[5:]:
+        # Keep only last 5 uploads PER USER
+        user_datasets = Dataset.objects.filter(user=request.user).order_by("-uploaded_at")
+        if user_datasets.count() > 5:
+            for old in user_datasets[5:]:
                 old.delete()
 
         return Response(
             {
                 "message": "File uploaded successfully",
                 "dataset_id": dataset.id,
+                "filename": file.name,
                 "summary": summary
             },
             status=status.HTTP_201_CREATED
         )
 
-# Functionality of retrieving last 5 uploads
+# Functionality of retrieving last 5 uploads for current user
 class DatasetHistoryView(APIView):
     permission_classes = [IsAuthenticated]
     
     def get(self, request):
-        datasets = Dataset.objects.order_by("-uploaded_at")[:5]
+        # Filter by current user - each user sees only their own datasets
+        datasets = Dataset.objects.filter(user=request.user).order_by("-uploaded_at")[:5]
         serializer = DatasetSerializer(datasets, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -79,7 +82,8 @@ class DatasetPDFReportView(APIView):
 
     def get(self, request, dataset_id):
         try:
-            dataset = Dataset.objects.get(id=dataset_id)
+            # Only allow downloading reports for user's own datasets
+            dataset = Dataset.objects.get(id=dataset_id, user=request.user)
         except Dataset.DoesNotExist:
             return Response(
                 {"error": "Dataset not found"},
@@ -94,3 +98,4 @@ class DatasetPDFReportView(APIView):
             as_attachment=True,
             filename=f"dataset_report_{dataset_id}.pdf",
         )
+

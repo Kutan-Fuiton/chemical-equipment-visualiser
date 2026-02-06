@@ -241,7 +241,7 @@ class ChartsPage(QWidget):
         content = QWidget()
         self.layout = QVBoxLayout(content)
         self.layout.setContentsMargins(40, 40, 40, 40)
-        self.layout.setSpacing(20)
+        self.layout.setSpacing(24)
 
         # Header with back button
         header_layout = QHBoxLayout()
@@ -266,15 +266,21 @@ class ChartsPage(QWidget):
         self.description.setObjectName("pageDescription")
         self.layout.addWidget(self.description)
 
-        # Stats grid
+        # Stats grid - horizontal row
         self.stats_grid = QGridLayout()
-        self.stats_grid.setSpacing(20)
+        self.stats_grid.setSpacing(16)
         self.layout.addLayout(self.stats_grid)
 
-        # Charts container
-        self.charts_layout = QVBoxLayout()
-        self.charts_layout.setSpacing(20)
-        self.layout.addLayout(self.charts_layout)
+        # Charts container - 2 column grid layout
+        self.charts_grid = QGridLayout()
+        self.charts_grid.setSpacing(20)
+        self.charts_grid.setColumnStretch(0, 1)
+        self.charts_grid.setColumnStretch(1, 1)
+        self.layout.addLayout(self.charts_grid)
+        
+        # Track chart position for grid placement
+        self.chart_row = 0
+        self.chart_col = 0
 
         self.layout.addStretch()
 
@@ -292,11 +298,23 @@ class ChartsPage(QWidget):
             if item.widget():
                 item.widget().deleteLater()
         
-        # Clear charts
-        while self.charts_layout.count():
-            item = self.charts_layout.takeAt(0)
+        # Clear charts grid
+        while self.charts_grid.count():
+            item = self.charts_grid.takeAt(0)
             if item.widget():
                 item.widget().deleteLater()
+        
+        # Reset grid position
+        self.chart_row = 0
+        self.chart_col = 0
+
+    def add_chart_to_grid(self, chart: ChartWidget):
+        """Add a chart to the 2-column grid layout."""
+        self.charts_grid.addWidget(chart, self.chart_row, self.chart_col)
+        self.chart_col += 1
+        if self.chart_col >= 2:
+            self.chart_col = 0
+            self.chart_row += 1
 
     def display_results(self, data: dict):
         """Display analysis results from API response."""
@@ -305,9 +323,12 @@ class ChartsPage(QWidget):
         # Handle both direct summary and nested summary
         summary = data.get("summary", data)
         
-        # Update description with dataset info
-        dataset_id = data.get("dataset_id", "N/A")
-        self.description.setText(f"Analysis complete for dataset #{dataset_id}")
+        # Update description
+        filename = data.get("filename", "")
+        if filename:
+            self.description.setText(f"Analysis complete • {filename}")
+        else:
+            self.description.setText("Analysis complete")
 
         # Stats cards - use safe .get() with defaults
         stats = [
@@ -321,35 +342,34 @@ class ChartsPage(QWidget):
             card = StatCard(title, value, icon)
             self.stats_grid.addWidget(card, 0, i)
 
-        # Type distribution bar chart
+        # Type distribution charts in 2-column grid
         type_dist = summary.get("type_distribution", {})
         type_metrics = summary.get("type_metrics", {})
         
         if type_dist:
+            # Row 1: Bar chart + Pie chart
             bar_chart = ChartWidget("Equipment Type Distribution")
             bar_chart.plot_bar(type_dist, xlabel="Type", ylabel="Count")
-            self.charts_layout.addWidget(bar_chart)
+            self.add_chart_to_grid(bar_chart)
 
-            # Pie chart
             pie_chart = ChartWidget("Type Distribution (Percentage)")
             pie_chart.plot_pie(type_dist)
-            self.charts_layout.addWidget(pie_chart)
+            self.add_chart_to_grid(pie_chart)
             
-            # Grouped bar chart - metrics by type
+            # Row 2: Grouped bar + Horizontal bar
             if type_metrics:
                 grouped_chart = ChartWidget("Metrics by Equipment Type")
                 grouped_chart.plot_grouped_bar(type_metrics)
-                self.charts_layout.addWidget(grouped_chart)
+                self.add_chart_to_grid(grouped_chart)
             
-            # Horizontal bar chart - ranking
             ranking_chart = ChartWidget("Equipment Ranking")
             ranking_chart.plot_horizontal_bar(type_dist)
-            self.charts_layout.addWidget(ranking_chart)
+            self.add_chart_to_grid(ranking_chart)
         else:
             # If no type distribution, show a message
             no_data_label = QLabel("No equipment type data available")
             no_data_label.setObjectName("pageDescription")
-            self.charts_layout.addWidget(no_data_label)
+            self.charts_grid.addWidget(no_data_label, 0, 0, 1, 2)
 
     def display_from_history(self, dataset: dict):
         """Display results from a history dataset."""
@@ -369,18 +389,37 @@ class ChartsPage(QWidget):
             card = StatCard(title, value, icon)
             self.stats_grid.addWidget(card, 0, i)
 
-        # Type distribution
+        # Type distribution in 2-column grid
         type_dist = dataset.get("type_distribution", {})
+        type_metrics = dataset.get("type_metrics", {})
+        
+        # Generate type_metrics if not provided
+        if type_dist and not type_metrics:
+            type_metrics = {}
+            for eq_type, count in type_dist.items():
+                type_metrics[eq_type] = {
+                    "count": count,
+                    "avg_flowrate": dataset.get("avg_flowrate", 0),
+                    "avg_pressure": dataset.get("avg_pressure", 0),
+                    "avg_temperature": dataset.get("avg_temperature", 0),
+                }
+        
         if type_dist:
+            # Row 1: Bar chart + Pie chart
             bar_chart = ChartWidget("Equipment Type Distribution")
             bar_chart.plot_bar(type_dist, xlabel="Type", ylabel="Count")
-            self.charts_layout.addWidget(bar_chart)
+            self.add_chart_to_grid(bar_chart)
 
             pie_chart = ChartWidget("Type Distribution (Percentage)")
             pie_chart.plot_pie(type_dist)
-            self.charts_layout.addWidget(pie_chart)
+            self.add_chart_to_grid(pie_chart)
             
-            # Horizontal bar chart - ranking
+            # Row 2: Grouped bar + Horizontal bar
+            if type_metrics:
+                grouped_chart = ChartWidget("Metrics by Equipment Type")
+                grouped_chart.plot_grouped_bar(type_metrics)
+                self.add_chart_to_grid(grouped_chart)
+            
             ranking_chart = ChartWidget("Equipment Ranking")
             ranking_chart.plot_horizontal_bar(type_dist)
-            self.charts_layout.addWidget(ranking_chart)
+            self.add_chart_to_grid(ranking_chart)

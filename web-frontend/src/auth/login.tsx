@@ -46,8 +46,8 @@ const ORBS = [
 ];
 
 const DEMO_CREDENTIALS = {
-  username: "Itami214",
-  password: "superuser",
+  username: "test1",
+  password: "admin.test1",
 };
 
 const Login = () => {
@@ -537,8 +537,8 @@ const Login = () => {
                   lineHeight: 1.5,
                 }}
               >
-                Username: <span style={{ color: "#63caff" }}>Itami214</span><br />
-                Password: <span style={{ color: "#63caff" }}>superuser</span>
+                Username: <span style={{ color: "#63caff" }}>test1</span><br />
+                Password: <span style={{ color: "#63caff" }}>admin.test1</span>
               </p>
             </div>
 

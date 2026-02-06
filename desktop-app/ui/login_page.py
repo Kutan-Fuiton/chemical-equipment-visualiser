@@ -130,8 +130,8 @@ class LoginPage(QWidget):
 
     def fill_demo_credentials(self):
         """Fill in demo credentials for testing."""
-        self.username_input.setText("Itami214")
-        self.password_input.setText("superuser")
+        self.username_input.setText("test1")
+        self.password_input.setText("admin.test1")
         self.error_label.hide()
 
     def clear_form(self):
