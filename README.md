@@ -70,7 +70,7 @@ The system follows a client-server architecture with two frontend clients commun
 
 ## 🚀 Features
 
-Both web and desktop applications provide the same core functionality with platform-specific implementations.
+Both web and desktop applications provide the same core functionality with platform-specific implementations. Users can upload CSV datasets, view interactive charts, browse upload history, and generate PDF reports.
 
 | Component | Key Features |
 |-----------|-------------|
@@ -95,6 +95,8 @@ Built with modern, production-ready technologies across all layers.
 ## 🔐 Demo Credentials
 
 Use these test accounts to explore the application. Each user has isolated data.
+
+**Authentication:** This project uses **Django REST Framework Token Authentication** via **Djoser**. Upon login, the server returns a token that is stored locally and sent with every API request for secure access.
 
 | Username | Password |
 |----------|----------|
