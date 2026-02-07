@@ -10,7 +10,14 @@ A high-performance, hybrid analytics system designed for chemical engineers to v
 
 ---
 
-## 🏗️ System Architecture
+## � Live Demo
+
+- 🖥️ **Web Application**: [https://chem-viz-opal.vercel.app](https://chem-viz-opal.vercel.app)
+- 🔧 **Backend API**: [https://chemical-equipment-visualiser.onrender.com](https://chemical-equipment-visualiser.onrender.com)
+
+---
+
+## �🏗️ System Architecture
 
 The system follows a client-server architecture with two frontend clients communicating with a centralized backend API.
 
